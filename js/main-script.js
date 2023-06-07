@@ -34,10 +34,12 @@ var mesh_toon_material_nave            = new    THREE.MeshToonMaterial();
 function createScene(){
     'use strict';
 
-    scene = new THREE.Scene()
-    scene.add(new THREE.AxesHelper(10))
-    buildFloor()
-    buildSkyDome()
+    scene = new THREE.Scene();
+    scene.add(new THREE.AxesHelper(10));
+    //createTree()
+    //createOvni()
+    buildFloor();
+    buildSkyDome();
 
 }
 
@@ -45,8 +47,14 @@ function createScene(){
 /* CREATE CAMERA(S) */
 //////////////////////
 function createCamera() {
+    //width = window.innerWidth / 2;
+    //height = window.innerHeight / 2;
+    //camera = new THREE.OrthographicCamera(- width, width, height, -height, 1, 1000);
+    //camera.position.set(100, 0, 100);
+    //camera.lookAt(scene.position);
+
     camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(50, 50, 50);
+    camera.position.set(25, 10, 25);
     camera.lookAt(scene.position);
 }
 
@@ -67,14 +75,14 @@ function buildFloor() {
     displacementScale : 5,
     wireframe : true
    })
-   var floor_cube = new THREE.PlaneGeometry(100, 100, 40  , 25)
+   var floor_cube = new THREE.PlaneGeometry(100, 100, 40, 25)
    var floor = new THREE.Mesh(floor_cube, floor_material)
    floor.rotation.x = Math.PI/2
    scene.add(floor) 
 }
 
 function buildSkyDome() {
-    var skyGeo = new THREE.SphereGeometry(50, 25, 25); 
+    var skyGeo = new THREE.SphereGeometry(100, 25, 25); 
     //var loader  = new THREE.TextureLoader();
     //texture = loader.load( "images/space.jpg" ); // colocar aqui depois a textura que quero
     var material = new THREE.MeshPhongMaterial({ 
@@ -84,6 +92,7 @@ function buildSkyDome() {
     });
     var sky = new THREE.Mesh(skyGeo, material);
     sky.material.side = THREE.BackSide;
+    sky.position.y = -10
     scene.add(sky);
 }
 
