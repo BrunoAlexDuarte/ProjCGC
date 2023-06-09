@@ -62,9 +62,9 @@ function createScene(){
     scene.add(new THREE.AxesHelper(10));
     buildFloor();
     buildSkyDome();
-    //createCasa();
     createLados(10);
     createTelhado();
+    createPortasJanelas();
     
     createTree(0,0,0);
     createTree(20,0,0);
@@ -105,35 +105,28 @@ function buildFloor() {
         map : floor_texture,
         displacementMap : displacement,
         displacementScale : 5,
-        map : floor_texture,
    });
 
-   var new_material = new THREE.MeshBasicMaterial({
-    color: 0x33ff00,
-    //wireframe : true,
-    map : floor_texture,
-    });
    var floor_cube = new THREE.PlaneGeometry(100, 100, 40, 40);
    floor = new THREE.Mesh(floor_cube, floor_material);
    floor.rotation.x = -Math.PI/2;
    floor.position.y = -25;
    floor.position.x = 0;
    floor.position.z = 0;
-   console.log(floor);
    scene.add(floor) 
 }
 
 function buildSkyDome() {
     var skyGeo = new THREE.SphereGeometry(100, 25, 25); 
-    var loader  = new THREE.TextureLoader();
-    var texture = loader.load( "ground.png" ); // colocar aqui depois a textura que quero
-    var material = new THREE.MeshPhongMaterial({ 
-        map: texture,
+    var sky_loader  = new THREE.TextureLoader();
+    var sky_texture = sky_loader.load("ground.png"); // colocar aqui depois a textura que quero
+    var sky_material = new THREE.MeshPhongMaterial({ 
         color : 0xffff00,
+        map: sky_texture,
         wireframe: true
     });
-    var sky = new THREE.Mesh(skyGeo, material);
-    sky.material.side = THREE.BackSide;
+    var sky = new THREE.Mesh(skyGeo, sky_material);
+    //sky.material.side = THREE.BackSide;
     sky.position.y = -10
     scene.add(sky);
 }
@@ -291,7 +284,7 @@ function createTelhado() {
     geom.setIndex( indices );
 
     geom.computeVertexNormals();
-    const material = new THREE.MeshBasicMaterial( { color: 0xdddd55 } );
+    const material = new THREE.MeshPhongMaterial( { color: 0xdddd55 } );
     const mesh = new THREE.Mesh( geom, material );
     scene.add(mesh);
 }
@@ -361,12 +354,51 @@ function createLados(pos_x) {
     geom.setIndex( indices );
 
     geom.computeVertexNormals();
-    const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+    const material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
     const mesh = new THREE.Mesh( geom, material );
     //mesh.position.x = pos_x;
     scene.add(mesh);
 }
 
+function createPortasJanelas() {
+    var geom = new THREE.BufferGeometry();
+
+    const vertices = new Float32Array(
+    [
+        //porta
+     -9.0, -4.0,  5.0, // v0 
+     -6.0, -4.0,  5.0, // v1 
+     -6.0,  1.0,  5.0, // v2 
+     -9.0,  1.0,  5.0, // v3 
+
+     //janela esquerda
+     -1.0, -1.0,  5.0, // v4 
+     -3.0, -1.0,  5.0, // v5 
+     -3.0,  1.0,  5.0, // v6 
+     -1.0,  1.0,  5.0, // v7 
+
+     //janela direita
+      2.0, -1.0,  5.0, // v8 
+      4.0, -1.0,  5.0, // v9 
+      2.0,  1.0,  5.0, // v10 
+      4.0,  1.0,  5.0, // v11 
+    ] );
+    geom.setAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
+    const indices = [ 
+        0, 1, 2,
+        0, 2, 3,
+        5, 4, 6,
+        7, 6, 4,
+        8, 9, 10, 
+        11, 10, 9,
+    ];
+    geom.setIndex( indices );
+
+    geom.computeVertexNormals();
+    const material = new THREE.MeshBasicMaterial( { color: 0x0099ff } );
+    const mesh = new THREE.Mesh( geom, material );
+    scene.add(mesh);
+}
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
@@ -488,7 +520,6 @@ function onKeyDown(e) {
     switch (e.keyCode) {
     //luzes
         case 80:
-            console.log("bolas");
             pointlight1.visible = !pointlight1.visible;
             pointlight2.visible = !pointlight2.visible;
             pointlight3.visible = !pointlight3.visible;
@@ -496,8 +527,6 @@ function onKeyDown(e) {
             break;
 
         case 83:
-            console.log("cilindro");
-            console.log(cylinderlight);
             //cylinderlight.intensity = 1 - cylinderlight.intensity;
             cylinderlight.visible = !cylinderlight.visible;
             break;
@@ -505,15 +534,12 @@ function onKeyDown(e) {
         case 37: // left arrow
             left = true;
             break;
-
         case 38: // up arrow
             forward = true;
             break;
-        
         case 39: // right arrow
             right = true;
             break;
-
         case 40: // down arrow
             backward = true;
             break;
