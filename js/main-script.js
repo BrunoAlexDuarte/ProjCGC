@@ -35,9 +35,7 @@ var mesh_phong_material_copa           = new   THREE.MeshBasicMaterial({color:0x
 
 var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4;
 
-var tree,ovni;
-var tronco_principal,tronco_secundario,branch;
-var copa_principal,copa_1,copa_2;
+var ovni;
 
 var ovni_body_geometry,sphere_geometry;
 
@@ -65,9 +63,11 @@ function createScene(){
     buildFloor();
     buildSkyDome();
 
-    tree=new THREE.Object3D();
+    
     ovni=new THREE.Object3D();
-    createTree();
+    createTree(0,0,0);
+    createTree(20,0,0);
+    createTree(0,0,20);
     createOvni();
 }
 
@@ -125,7 +125,8 @@ function buildSkyDome() {
     scene.add(sky);
 }
 
-function createTree() {
+function createTree(x,y,z){
+    tree=new THREE.Object3D();
     //create the main branch
     var tronco_principal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 5), mesh_phong_material_tronco);// raio de cima,raio debaixo,altura
     tronco_principal.position.set(0,2,0);
@@ -179,6 +180,7 @@ function createTree() {
     tree.add(copa_principal);
     tree.add(copa_1);
     tree.add(copa_2);
+    tree.position.set(x,y,z);
     scene.add(tree);
 }
 
