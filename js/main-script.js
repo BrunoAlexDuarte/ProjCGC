@@ -60,16 +60,16 @@ function createScene(){
 
     scene = new THREE.Scene();
     scene.add(new THREE.AxesHelper(10));
-    //buildFloor();
-    //buildSkyDome();
+    buildFloor();
+    buildSkyDome();
     //createCasa();
     createLados(10);
     createTelhado();
     
-    //createTree(0,0,0);
-    //createTree(20,0,0);
-    //createTree(0,0,20);
-    //createOvni();
+    createTree(0,0,0);
+    createTree(20,0,0);
+    createTree(0,0,20);
+    createOvni();
 }
 
 //////////////////////
@@ -250,28 +250,6 @@ function createOvni() {
 
 }
 
-function createCasaEx() {
-    const geometry = new THREE.BufferGeometry();
-    // listar vértices (vectores 3D com as coordenadas de cada vértice)
-    const vertices = new Float32Array(
-    [ -1.0, -1.0, 1.0, // v0
-    1.0, -1.0, 1.0, // v1
-    1.0, 1.0, 1.0, // v2
-    -1.0, 1.0, 1.0, // v3 
-    ] );
-    geometry.setAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
-    // listar tripletos de índices por forma a definir cada face/triângulo
-    // notem que a sequência de índices deve indicar o sentido da normal
-    const indices = [ 0, 1, 2, 2, 3, 0 ];
-    geometry.setIndex( indices );
-    // não esquecer de calcular as normais de cada face
-    geometry.computeVertexNormals();
-    // uma vez na posse de uma geometria, definir um material e criar uma Mesh
-    const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-    const mesh = new THREE.Mesh( geometry, material );
-    scene.add(mesh);
-}
-
 function createTelhado() {
     var geom = new THREE.BufferGeometry();
     const vertices = new Float32Array(
@@ -302,12 +280,6 @@ function createTelhado() {
     const mesh = new THREE.Mesh( geom, material );
     scene.add(mesh);
 }
-
-function createFrente() {
-
-    
-}
-
 
 function createLados(pos_x) {
     var geom = new THREE.BufferGeometry();
@@ -380,7 +352,6 @@ function createLados(pos_x) {
     scene.add(mesh);
 }
 
-function createTeto() {}
 
 function creaetCasa() {
     createLado(20);
@@ -410,9 +381,9 @@ function handleCollisions(){
 ////////////
 function update(){
     'use strict';
-    //update_velocity();
-    //var rotation_velocity=0.01;
-    //ovni.rotation.y+=rotation_velocity;
+    update_velocity();
+    var rotation_velocity=0.01;
+    ovni.rotation.y+=rotation_velocity;
 }
 
 function update_velocity() {
@@ -510,7 +481,8 @@ function onKeyDown(e) {
         case 83:
             console.log("cilindro");
             console.log(cylinderlight);
-            cylinderlight.intensity = 1 - cylinderlight.intensity;
+            //cylinderlight.intensity = 1 - cylinderlight.intensity;
+            cylinderlight.visible = !cylinderlight.visible;
             break;
         // arrow keys mudam variaveis booleanas que sao usadas no update
         case 37: // left arrow
