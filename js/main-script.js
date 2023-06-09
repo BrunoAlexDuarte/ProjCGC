@@ -60,15 +60,16 @@ function createScene(){
 
     scene = new THREE.Scene();
     scene.add(new THREE.AxesHelper(10));
-    buildFloor();
-    buildSkyDome();
-
+    //buildFloor();
+    //buildSkyDome();
+    //createCasa();
+    createLados(10);
+    createTelhado();
     
-    ovni=new THREE.Object3D();
-    createTree(0,0,0);
-    createTree(20,0,0);
-    createTree(0,0,20);
-    createOvni();
+    //createTree(0,0,0);
+    //createTree(20,0,0);
+    //createTree(0,0,20);
+    //createOvni();
 }
 
 //////////////////////
@@ -185,6 +186,7 @@ function createTree(x,y,z){
 }
 
 function createOvni() {
+    ovni=new THREE.Object3D();
     //create ovni body
     var ovni_body_geometry=new THREE.SphereGeometry(1);
     var ovni_body=new THREE.Mesh(ovni_body_geometry,material_ovni_body);
@@ -248,7 +250,109 @@ function createOvni() {
 
 }
 
-function createCasa() {
+function createCasaEx() {
+    const geometry = new THREE.BufferGeometry();
+    // listar vértices (vectores 3D com as coordenadas de cada vértice)
+    const vertices = new Float32Array(
+    [ -1.0, -1.0, 1.0, // v0
+    1.0, -1.0, 1.0, // v1
+    1.0, 1.0, 1.0, // v2
+    -1.0, 1.0, 1.0, // v3 
+    ] );
+    geometry.setAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
+    // listar tripletos de índices por forma a definir cada face/triângulo
+    // notem que a sequência de índices deve indicar o sentido da normal
+    const indices = [ 0, 1, 2, 2, 3, 0 ];
+    geometry.setIndex( indices );
+    // não esquecer de calcular as normais de cada face
+    geometry.computeVertexNormals();
+    // uma vez na posse de uma geometria, definir um material e criar uma Mesh
+    const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+    const mesh = new THREE.Mesh( geometry, material );
+    scene.add(mesh);
+}
+
+function createTelhado() {
+    var geom = new THREE.BufferGeometry();
+    const vertices = new Float32Array(
+    [
+     10.0,  4.0,  5.0, // v0
+    -10.0,  4.0,  5.0, // v1
+
+     10.0,  4.0, -5.0, // v2
+    -10.0,  4.0, -5.0, // v3
+
+     10.0,  8.0,  0.0, // v4
+    -10.0,  8.0,  0.0, // v5
+    ] );
+    geom.setAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
+
+    const indices = [ 
+        3, 5, 1, //lado esquerdo
+        2, 4, 0, //lado direito
+        0, 4, 1, //frente telhado 
+        4, 5, 1, //frente telhado
+        2, 3, 4, //tras telhado
+        3, 5, 4, //tras telhado                    
+    ];
+    geom.setIndex( indices );
+
+    geom.computeVertexNormals();
+    const material = new THREE.MeshBasicMaterial( { color: 0xdddd55 } );
+    const mesh = new THREE.Mesh( geom, material );
+    scene.add(mesh);
+}
+
+function createFrente() {
+
+    
+}
+
+
+function createLados(pos_x) {
+    var geom = new THREE.BufferGeometry();
+
+    const vertices = new Float32Array(
+    [
+    -10.0, -4.0,  5.0, // v0
+     10.0, -4.0,  5.0, // v1
+     10.0,  4.0,  5.0, // v2
+    -10.0,  4.0,  5.0, // v3
+    -10.0, -4.0, -5.0, // v4
+     10.0, -4.0, -5.0, // v5
+     10.0,  4.0, -5.0, // v6
+    -10.0,  4.0, -5.0, // v7
+     10.0,  7.0,  0.0, // v8
+    -10.0,  7.0,  0.0, // v9
+    ] );
+    geom.setAttribute( 'position', new THREE.BufferAttribute(vertices, 3) );
+
+
+    const indices = [ 
+                    0, 1, 2, //parte frente 
+                    2, 3, 0, //parte frente
+                    4, 5, 6, //parte tras 
+                    4, 6, 7, //parte tras
+                    0, 4, 3, //esquerda
+                    3, 4, 7, //esquerda
+                    1, 5, 6, //direita
+                    1, 6, 2, //direita
+                    ];
+    geom.setIndex( indices );
+
+    geom.computeVertexNormals();
+    const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+    const mesh = new THREE.Mesh( geom, material );
+    //mesh.position.x = pos_x;
+    scene.add(mesh);
+}
+
+function createTeto() {}
+
+function creaetCasa() {
+    createLado(20);
+    createLado(-20);
+    createTeto();
 
 }
 
@@ -273,9 +377,9 @@ function handleCollisions(){
 ////////////
 function update(){
     'use strict';
-    update_velocity();
-    var rotation_velocity=0.01;
-    ovni.rotation.y+=rotation_velocity;
+    //update_velocity();
+    //var rotation_velocity=0.01;
+    //ovni.rotation.y+=rotation_velocity;
 }
 
 function update_velocity() {
