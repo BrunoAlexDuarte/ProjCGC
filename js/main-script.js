@@ -49,6 +49,8 @@ var material_ovni_light=new THREE.MeshBasicMaterial({color:0x9932CC});
 var forward = false, backward = false, left = false, right = false;
 var ovni_velocity=0.1;
 
+var material_casa_paredes, material_casa_teto, material_tronco, material_copa, material_cockpit, material_nave;
+
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
@@ -92,6 +94,7 @@ function createCamera() {
 function buildFloor() {
    const loader = new THREE.TextureLoader()
    const displacement = loader.load("heightmap.png")
+   //var texture == loader.load("texture do chao");
    floor_material = new THREE.MeshPhongMaterial({
     color : 0xffff00,
     displacementMap : displacement,
@@ -119,7 +122,7 @@ function buildSkyDome() {
     scene.add(sky);
 }
 
-function createTree(){
+function createTree() {
     //create the main branch
     var tronco_principal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 5), mesh_phong_material_tronco);// raio de cima,raio debaixo,altura
     tronco_principal.position.set(0,2,0);
@@ -176,7 +179,7 @@ function createTree(){
     scene.add(tree);
 }
 
-function createOvni(){
+function createOvni() {
     //create ovni body
     var ovni_body_geometry=new THREE.SphereGeometry(1);
     var ovni_body=new THREE.Mesh(ovni_body_geometry,material_ovni_body);
@@ -240,6 +243,9 @@ function createOvni(){
 
 }
 
+function createCasa() {
+
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -378,6 +384,28 @@ function onKeyDown(e) {
     case 40: // down arrow
         backward = true;
         break;
+        case 81: //Q
+            material_casa_paredes = mesh_lambert_material_casa_paredes;
+            material_casa_teto    = mesh_lambert_material_casa_teto;
+            material_tronco       = mesh_lambert_material_tronco;
+            material_copa         = mesh_lambert_material_copa;
+            material_cockpit      = mesh_lambert_material_cockpit;
+            material_nave         = mesh_lambert_material_nave;
+        case 69: //E
+            material_casa_paredes = mesh_phong_material_casa_paredes;
+            material_casa_teto    = mesh_phong_material_casa_teto;
+            material_tronco       = mesh_phong_material_tronco;
+            material_copa         = mesh_phong_material_copa;
+            material_cockpit      = mesh_phong_material_cockpit;
+            material_nave         = mesh_phong_material_nave;
+        case 87: //W
+            material_casa_paredes = mesh_toon_material_casa_paredes;
+            material_casa_teto    = mesh_toon_material_casa_teto;
+            material_tronco       = mesh_toon_material_tronco;
+            material_copa         = mesh_toon_material_copa;
+            material_cockpit      = mesh_toon_material_cockpit;
+            material_nave         = mesh_toon_material_nave;
+        case 82: //R
     }
     
 }
