@@ -198,23 +198,26 @@ function createTree(x,y,z){
 }
 
 function createOvni() {
-    ovni=new THREE.Object3D();
     //create ovni body
+    ovni=new THREE.Object3D();
+    var light_target = new THREE.Object3D();
+    ovni.add(light_target);
+
     var ovni_body_geometry=new THREE.SphereGeometry(1);
     var ovni_body=new THREE.Mesh(ovni_body_geometry,material_ovni_body);
     ovni_body.position.set(0,20,0);
     ovni_body.rotation.x=Math.PI/2;
-
+    
     ovni_body.scale.x=20;
     ovni_body.scale.y=20;
     ovni_body.scale.z=2;
-
+    
     //create ovni cockpit
     var thetaStart = 0; // Ângulo inicial da calota (em radianos)
     var thetaLength = Math.PI; // Ângulo de abertura da calota (em radianos)
     var phiStart = 0; // Ângulo inicial da esfera completa (em radianos)
     var phiLength =Math.PI; // Ângulo de abertura da esfera completa (em radianos)
-
+    
     var cockpit_geometry=new THREE.SphereGeometry(6,32, 32, thetaStart, thetaLength, phiStart, phiLength);
     var cockpit=new THREE.Mesh(cockpit_geometry,material_ovni_cockpit);
     cockpit.position.set(0,21,0);
@@ -225,6 +228,7 @@ function createOvni() {
     var ovni_cylinder=new THREE.Mesh(new THREE.CylinderGeometry(7,7,2),material_ovni_cylinder);
     ovni_cylinder.position.set(0,18,0);
     cylinderlight=new THREE.SpotLight(0xFFFF00, 1, 0, 50);
+    cylinderlight.target = light_target;
     ovni_cylinder.add(cylinderlight);
     
 
@@ -250,7 +254,6 @@ function createOvni() {
     ovni_light4.add(pointlight4);
 
     //create the ovni
-    ovni=new THREE.Object3D();
     ovni.add(ovni_body);
     ovni.add(cockpit);
     ovni.add(ovni_cylinder);
@@ -362,14 +365,6 @@ function createLados(pos_x) {
     const mesh = new THREE.Mesh( geom, material );
     //mesh.position.x = pos_x;
     scene.add(mesh);
-}
-
-
-function creaetCasa() {
-    createLado(20);
-    createLado(-20);
-    createTeto();
-
 }
 
 //////////////////////
