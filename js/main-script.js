@@ -373,7 +373,7 @@ function onKeyDown(e) {
         case 83:
             console.log("cilindro");
             console.log(cylinderlight);
-            cylinderlight.inteisity = 1 - cylinderlight.intensity;
+            cylinderlight.intensity = 1 - cylinderlight.intensity;
             break;
         // arrow keys mudam variaveis booleanas que sao usadas no update
         case 37: // left arrow
