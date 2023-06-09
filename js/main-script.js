@@ -6,32 +6,25 @@ var scene, camera, renderer
 var geometry, material, mesh;
 
 
-var mesh_lambert_material_casa_paredes = new THREE.MeshLambertMaterial(); 
-var mesh_phong_material_casa_paredes   = new   THREE.MeshPhongMaterial();
-var mesh_toon_material_casa_paredes    = new    THREE.MeshToonMaterial();
+var mesh_lambert_material_casa_paredes = new THREE.MeshLambertMaterial({ color: 0xff0000 } ); 
+var mesh_phong_material_casa_paredes   = new   THREE.MeshPhongMaterial({ color: 0xff0000 } );
+var mesh_toon_material_casa_paredes    = new    THREE.MeshToonMaterial({ color: 0xff0000 } );
 
-var mesh_lambert_material_casa_teto    = new THREE.MeshLambertMaterial();
-var mesh_phong_material_casa_teto      = new   THREE.MeshPhongMaterial();
-var mesh_toon_material_casa_teto       = new    THREE.MeshToonMaterial();
+var mesh_lambert_material_casa_teto    = new THREE.MeshLambertMaterial({ color: 0xdddd55 });
+var mesh_phong_material_casa_teto      = new   THREE.MeshPhongMaterial({ color: 0xdddd55 });
+var mesh_toon_material_casa_teto       = new    THREE.MeshToonMaterial({ color: 0xdddd55 });
 
-var mesh_lambert_material_tronco       = new THREE.MeshLambertMaterial();
+var mesh_lambert_material_casa_janelasporta = new THREE.MeshLambertMaterial({ color: 0x0022ff }); 
+var mesh_phong_material_casa_janelasporta   = new   THREE.MeshPhongMaterial({ color: 0x0022ff });
+var mesh_toon_material_casa_janelasporta    = new    THREE.MeshToonMaterial({ color: 0x0022ff });
+
+var mesh_lambert_material_tronco       = new THREE.MeshLambertMaterial({ color: 0xD2691E});
 var mesh_phong_material_tronco         = new   THREE.MeshPhongMaterial({ color: 0xD2691E}); 
-var mesh_toon_material_tronco          = new    THREE.MeshToonMaterial();
+var mesh_toon_material_tronco          = new    THREE.MeshToonMaterial({ color: 0xD2691E});
 
-var mesh_lambert_material_copa         = new THREE.MeshLambertMaterial();
+var mesh_lambert_material_copa         = new THREE.MeshLambertMaterial({color:0x7CFC00});
 var mesh_phong_material_copa           = new   THREE.MeshPhongMaterial({color:0x7CFC00}); 
-var mesh_toon_material_copa            = new    THREE.MeshToonMaterial();
-
-var mesh_lambert_material_cockpit      = new THREE.MeshLambertMaterial();
-var mesh_phong_material_cockpit        = new   THREE.MeshPhongMaterial({color:0xE8E8E8});
-var mesh_toon_material_cockpit         = new    THREE.MeshToonMaterial();
-
-var mesh_lambert_material_nave         = new THREE.MeshLambertMaterial();
-var mesh_phong_material_nave           = new   THREE.MeshPhongMaterial({color:0x808080});
-var mesh_toon_material_nave            = new    THREE.MeshToonMaterial();
-
-var mesh_phong_material_tronco         = new   THREE.MeshBasicMaterial({ color: 0xD2691E});
-var mesh_phong_material_copa           = new   THREE.MeshBasicMaterial({color:0x7CFC00}); 
+var mesh_toon_material_copa            = new    THREE.MeshToonMaterial({color:0x7CFC00});
 
 var moonLightColor = 0xf4ef8f;
 var moon_position = new THREE.Vector3(00, 100, -300);
@@ -54,7 +47,7 @@ var material_ovni_light=new THREE.MeshBasicMaterial({color:0x9932CC});
 var forward = false, backward = false, left = false, right = false;
 var ovni_velocity=0.1;
 
-var material_casa_paredes, material_casa_teto, material_tronco, material_copa, material_cockpit, material_nave;
+var casa, casa_paredes, casa_teto, tronco1, copa1, tronco2, copa2, tronco2, copa3, casa_janelasporta;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -320,9 +313,9 @@ function createTelhado() {
     geom.setIndex( indices );
 
     geom.computeVertexNormals();
-    const material = new THREE.MeshPhongMaterial( { color: 0xdddd55 } );
-    const mesh = new THREE.Mesh( geom, material );
-    scene.add(mesh);
+    const material = mesh_phong_material_casa_teto;
+    casa_teto = new THREE.Mesh( geom, material );
+    scene.add(casa_teto);
 }
 
 function createLados(pos_x) {
@@ -390,10 +383,11 @@ function createLados(pos_x) {
     geom.setIndex( indices );
 
     geom.computeVertexNormals();
-    const material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
-    const mesh = new THREE.Mesh( geom, material );
+    const material = mesh_phong_material_casa_paredes;
+    casa_paredes = new THREE.Mesh( geom, material );
     //mesh.position.x = pos_x;
-    scene.add(mesh);
+
+    scene.add(casa_paredes);
 }
 
 function createPortasJanelas() {
@@ -431,9 +425,9 @@ function createPortasJanelas() {
     geom.setIndex( indices );
 
     geom.computeVertexNormals();
-    const material = new THREE.MeshBasicMaterial( { color: 0x0099ff } );
-    const mesh = new THREE.Mesh( geom, material );
-    scene.add(mesh);
+    const material = mesh_phong_material_casa_janelasporta;
+    casa_janelasporta = new THREE.Mesh( geom, material );
+    scene.add(casa_janelasporta);
 }
 
 
@@ -483,7 +477,6 @@ function update_velocity() {
         }
     }
 }
-
 
 /////////////
 /* DISPLAY */
@@ -689,7 +682,6 @@ function onKeyDown(e) {
             pointlight3.visible = !pointlight3.visible;
             pointlight4.visible = !pointlight4.visible;
             break;
-
         case 83: //S
             console.log("cilindro");
             console.log(cylinderlight);
@@ -716,28 +708,29 @@ function onKeyDown(e) {
             backward = true;
             break;
         case 81: //Q
-            material_casa_paredes = mesh_lambert_material_casa_paredes;
-            material_casa_teto    = mesh_lambert_material_casa_teto;
-            material_tronco       = mesh_lambert_material_tronco;
-            material_copa         = mesh_lambert_material_copa;
-            material_cockpit      = mesh_lambert_material_cockpit;
-            material_nave         = mesh_lambert_material_nave;
+	    console.log("LAMBERT");
+            casa_janelasporta.material = mesh_lambert_material_casa_paredes;
+            casa_teto.material    = mesh_lambert_material_casa_teto;
+            casa_janelasporta.material = mesh_lambert_material_casa_janelasporta;
+            //material_tronco       = mesh_lambert_material_tronco;
+            //material_copa         = mesh_lambert_material_copa;
+            console.ma
             break;
         case 69: //E
-            material_casa_paredes = mesh_phong_material_casa_paredes;
-            material_casa_teto    = mesh_phong_material_casa_teto;
-            material_tronco       = mesh_phong_material_tronco;
-            material_copa         = mesh_phong_material_copa;
-            material_cockpit      = mesh_phong_material_cockpit;
-            material_nave         = mesh_phong_material_nave;
+            console.log("PHONG");
+            casa_paredes.material      = mesh_phong_material_casa_paredes;
+            casa_teto.material         = mesh_phong_material_casa_teto;
+            casa_janelasporta.material = mesh_phong_material_casa_janelasporta;
+            //material_tronco       = mesh_phong_material_tronco;
+            //material_copa         = mesh_phong_material_copa;
             break;
         case 87: //W
-            material_casa_paredes = mesh_toon_material_casa_paredes;
-            material_casa_teto    = mesh_toon_material_casa_teto;
-            material_tronco       = mesh_toon_material_tronco;
-            material_copa         = mesh_toon_material_copa;
-            material_cockpit      = mesh_toon_material_cockpit;
-            material_nave         = mesh_toon_material_nave;
+            console.log("TOON");
+            casa_paredes.material = mesh_toon_material_casa_paredes;
+            casa_teto.material    = mesh_toon_material_casa_teto;
+            casa_janelasporta.material = mesh_toon_material_casa_janelasporta;
+            //material_tronco       = mesh_toon_material_tronco;
+            //material_copa         = mesh_toon_material_copa;
             break;
         case 82: //R
             break;
