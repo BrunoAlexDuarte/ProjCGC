@@ -5,7 +5,7 @@
 var scene, camera, renderer
 var geometry, material, mesh;
 
-/*
+
 var mesh_lambert_material_casa_paredes = new THREE.MeshLambertMaterial(); 
 var mesh_phong_material_casa_paredes   = new   THREE.MeshPhongMaterial();
 var mesh_toon_material_casa_paredes    = new    THREE.MeshToonMaterial();
@@ -29,13 +29,16 @@ var mesh_toon_material_cockpit         = new    THREE.MeshToonMaterial();
 var mesh_lambert_material_nave         = new THREE.MeshLambertMaterial();
 var mesh_phong_material_nave           = new   THREE.MeshPhongMaterial({color:0x808080});
 var mesh_toon_material_nave            = new    THREE.MeshToonMaterial();
-*/
+
 var mesh_phong_material_tronco         = new   THREE.MeshBasicMaterial({ color: 0xD2691E});
 var mesh_phong_material_copa           = new   THREE.MeshBasicMaterial({color:0x7CFC00}); 
+
+var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4;
 
 var tree,ovni;
 var tronco_principal,tronco_secundario,branch;
 var copa_principal,copa_1,copa_2;
+
 var ovni_body_geometry,sphere_geometry;
 
 var scale = 10;
@@ -79,7 +82,7 @@ function createCamera() {
     //camera.lookAt(scene.position);
 
     camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(25, 10, 25);
+    camera.position.set(25, 25, 25);
     camera.lookAt(scene.position);
 }
 
@@ -205,29 +208,29 @@ function createOvni() {
     //create ovni cylinder
     var ovni_cylinder=new THREE.Mesh(new THREE.CylinderGeometry(7,7,2),material_ovni_cylinder);
     ovni_cylinder.position.set(0,18,0);
-    var cylinderlight=new THREE.SpotLight(0xFFFF00);
+    cylinderlight=new THREE.SpotLight(0xFFFF00, 1, 0, 50);
     ovni_cylinder.add(cylinderlight);
     
 
     //create ovni lights
     var ovni_light1=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light1.position.set(12,18,0);
-    var pointlight1=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight1=new THREE.PointLight(0xFFFF00,1,60);
     ovni_light1.add(pointlight1);
 
     var ovni_light2=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light2.position.set(-12,18,0);
-    var pointlight2=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight2=new THREE.PointLight(0xFFFF00,1,60);
     ovni_light2.add(pointlight2);
 
     var ovni_light3=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light3.position.set(0,18,12);
-    var pointlight3=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight3=new THREE.PointLight(0xFFFF00,1,60);
     ovni_light3.add(pointlight3);
 
     var ovni_light4=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light4.position.set(0,18,-12);
-    var pointlight4=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight4=new THREE.PointLight(0xFFFF00,1,60);
     ovni_light4.add(pointlight4);
 
     //create the ovni
@@ -357,33 +360,35 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
     //luzes
-    case 80:
-        pointlight1.visible = !pointlight1.visible;
-        pointlight2.visible = !pointlight2.visible;
-        pointlight2.visible = !pointlight2.visible;
-        pointlight2.visible = !pointlight2.visible;
-        break;
+        case 80:
+            console.log("bolas");
+            pointlight1.intensity = 1 - pointlight1.intensity;
+            pointlight2.intensity = 1 - pointlight2.intensity;
+            pointlight3.intensity = 1 - pointlight3.intensity;
+            pointlight4.intensity = 1 - pointlight4.intensity;
+            break;
 
-    case 83:
-        cylinderlight.visible=!cylinderlight.visible;
-        break;
+        case 83:
+            console.log("cilindro");
+            console.log(cylinderlight);
+            cylinderlight.inteisity = 1 - cylinderlight.intensity;
+            break;
+        // arrow keys mudam variaveis booleanas que sao usadas no update
+        case 37: // left arrow
+            left = true;
+            break;
 
-    // arrow keys mudam variaveis booleanas que sao usadas no update
-    case 37: // left arrow
-        left = true;
-        break;
+        case 38: // up arrow
+            forward = true;
+            break;
+        
+        case 39: // right arrow
+            right = true;
+            break;
 
-    case 38: // up arrow
-        forward = true;
-        break;
-    
-    case 39: // right arrow
-        right = true;
-        break;
-
-    case 40: // down arrow
-        backward = true;
-        break;
+        case 40: // down arrow
+            backward = true;
+            break;
         case 81: //Q
             material_casa_paredes = mesh_lambert_material_casa_paredes;
             material_casa_teto    = mesh_lambert_material_casa_teto;
