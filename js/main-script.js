@@ -30,7 +30,7 @@ var moonLightColor = 0xf4ef8f;
 var moon_position = new THREE.Vector3(0, 100, -300);
 var mesh_toon_material_moon           = new THREE.MeshToonMaterial({ color: moonLightColor, emissive: 0x202020 });
 
-var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4, directional_light;
+var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4, directional_light, ambient_light;
 
 var ovni, floor;
 
@@ -105,7 +105,8 @@ function createLights() {
     'use strict';
 
     // INIT HEMISPHERE LIGHT
-    scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+    ambient_light = new THREE.AmbientLight(0xffffff, 0.1);
+    scene.add(ambient_light);
 
     // directional light
     directional_light = new THREE.DirectionalLight(moonLightColor, 1);
@@ -720,6 +721,13 @@ function onKeyDown(e) {
             change_material_tree(2);
             break;
         case 82: //R
+            cylinderlight.visible = !cylinderlight.visible;
+            pointlight1.visible = !pointlight1.visible;
+            pointlight2.visible = !pointlight2.visible;
+            pointlight3.visible = !pointlight3.visible;
+            pointlight4.visible = !pointlight4.visible;
+            ambient_light.visible = !ambient_light.visible;
+            directional_light.visible = !directional_light.visible;
             break;
     }
     
