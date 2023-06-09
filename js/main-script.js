@@ -619,6 +619,10 @@ function generateTextureGround() {
 
 function render() {
     'use strict';
+    
+    // Update the VR camera's position and orientation
+    camera.updateMatrixWorld();    
+
     renderer.render(scene, camera)
 }
 
@@ -631,15 +635,16 @@ function init() {
         antialias: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
     renderer.setClearColor( 0xffffff, 0);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.xr.enabled = true;
+    document.body.appendChild(VRButton.createButton(renderer));
+    document.body.appendChild(renderer.domElement);
+
     createScene();
     createCamera();
     createLights();
-
-    render();
 
     window.addEventListener("resize", onResize);
     window.addEventListener("keyup", onKeyUp);
@@ -654,7 +659,8 @@ function animate() {
     update();
 
     render();
-    requestAnimationFrame(animate);
+    // requestAnimationFrame(animate);
+    renderer.setAnimationLoop(animate);
 }
 
 ////////////////////////////
