@@ -35,7 +35,7 @@ var mesh_phong_material_copa           = new   THREE.MeshBasicMaterial({color:0x
 
 var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4;
 
-var ovni;
+var ovni, floor;
 
 var ovni_body_geometry,sphere_geometry;
 
@@ -96,27 +96,39 @@ function createCamera() {
 ////////////////////////
 
 function buildFloor() {
-   const loader = new THREE.TextureLoader()
-   const displacement = loader.load("heightmap.png")
-   //var texture == loader.load("texture do chao");
+   const loader = new THREE.TextureLoader();
+   const displacement = loader.load("heightmap.png");
+   const loader_floor = new THREE.TextureLoader();
+   var floor_texture = loader_floor.load("ground.png");
    floor_material = new THREE.MeshPhongMaterial({
-    color : 0xffff00,
-    displacementMap : displacement,
-    displacementScale : 5,
-    wireframe : true
-   })
-   var floor_cube = new THREE.PlaneGeometry(100, 100, 40, 25)
-   var floor = new THREE.Mesh(floor_cube, floor_material)
-   floor.rotation.x = Math.PI/2
+        color : 0xffff00,
+        map : floor_texture,
+        displacementMap : displacement,
+        displacementScale : 5,
+        map : floor_texture,
+   });
+
+   var new_material = new THREE.MeshBasicMaterial({
+    color: 0x33ff00,
+    //wireframe : true,
+    map : floor_texture,
+    });
+   var floor_cube = new THREE.PlaneGeometry(100, 100, 40, 40);
+   floor = new THREE.Mesh(floor_cube, floor_material);
+   floor.rotation.x = -Math.PI/2;
+   floor.position.y = -25;
+   floor.position.x = 0;
+   floor.position.z = 0;
+   console.log(floor);
    scene.add(floor) 
 }
 
 function buildSkyDome() {
     var skyGeo = new THREE.SphereGeometry(100, 25, 25); 
-    //var loader  = new THREE.TextureLoader();
-    //texture = loader.load( "images/space.jpg" ); // colocar aqui depois a textura que quero
+    var loader  = new THREE.TextureLoader();
+    var texture = loader.load( "ground.png" ); // colocar aqui depois a textura que quero
     var material = new THREE.MeshPhongMaterial({ 
-        //map: texture
+        map: texture,
         color : 0xffff00,
         wireframe: true
     });
@@ -472,10 +484,10 @@ function onKeyDown(e) {
     //luzes
         case 80:
             console.log("bolas");
-            pointlight1.intensity = 1 - pointlight1.intensity;
-            pointlight2.intensity = 1 - pointlight2.intensity;
-            pointlight3.intensity = 1 - pointlight3.intensity;
-            pointlight4.intensity = 1 - pointlight4.intensity;
+            pointlight1.visible = !pointlight1.visible;
+            pointlight2.visible = !pointlight2.visible;
+            pointlight3.visible = !pointlight3.visible;
+            pointlight4.visible = !pointlight4.visible;
             break;
 
         case 83:
