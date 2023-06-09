@@ -33,7 +33,11 @@ var mesh_toon_material_nave            = new    THREE.MeshToonMaterial();
 var mesh_phong_material_tronco         = new   THREE.MeshBasicMaterial({ color: 0xD2691E});
 var mesh_phong_material_copa           = new   THREE.MeshBasicMaterial({color:0x7CFC00}); 
 
-var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4;
+var moonLightColor = 0xf4ef8f;
+var moon_position = new THREE.Vector3(00, 100, -300);
+var mesh_toon_material_moon           = new THREE.MeshToonMaterial({ color: moonLightColor, emissive: 0x202020 });
+
+var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4, directional_light;
 
 var ovni, floor;
 
@@ -66,10 +70,26 @@ function createScene(){
     createTelhado();
     createPortasJanelas();
     
-    createTree(0,0,0);
-    createTree(20,0,0);
-    createTree(0,0,20);
+    createTree(-10,0,-10, 0, Math.PI*2, Math.PI*2);
+    createTree(20,0,0, 0, Math.PI*2, Math.PI*2);
+    createTree(0,0,20, Math.PI*2, Math.PI*2, Math.PI*2);
+    createTree(30,0,10, Math.PI*2, 0, 0);
+    createTree(30,0,30, Math.PI*2, Math.PI*2, 0);
+    createTree(10,0,30, 0, Math.PI*2, 0);
+    createTree(-20,0,30, 0, Math.PI*2, 0);
+    createTree(-30,0,10, Math.PI*2, 0, 0);
+    createTree(-30,0,30, Math.PI*2, Math.PI*2, 0);
+    createTree(-10,0,-30, 0, Math.PI*2, Math.PI*2);
+    createTree(20,0,-30, 0, Math.PI*2, Math.PI*2);
+    createTree(0,0,-20, Math.PI*2, Math.PI*2, Math.PI*2);
+    createTree(30,0,-10, Math.PI*2, 0, 0);
+    createTree(30,0,-30, Math.PI*2, Math.PI*2, 0);
+    createTree(10,0,-30, 0, Math.PI*2, 0);
+    createTree(-20,0,-30, 0, Math.PI*2, 0);
+    createTree(-30,0,-10, Math.PI*2, 0, 0);
+    createTree(-30,0,-30, Math.PI*2, Math.PI*2, 0);
     createOvni();
+    createMoon();
 }
 
 //////////////////////
@@ -83,7 +103,7 @@ function createCamera() {
     //camera.lookAt(scene.position);
 
     camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(25, 25, 25);
+    camera.position.set(30, 15, 30);
     camera.lookAt(scene.position);
 }
 
@@ -91,47 +111,60 @@ function createCamera() {
 /* CREATE LIGHT(S) */
 /////////////////////
 
+function createLights() {
+    'use strict';
+
+    // INIT HEMISPHERE LIGHT
+    scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+    // directional light
+    directional_light = new THREE.DirectionalLight(moonLightColor, 1);
+    directional_light.position.set(moon_position.x, moon_position.y, moon_position.z);
+    directional_light.target = ovni;
+    scene.add(directional_light);
+}
+
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
 
 function buildFloor() {
    const loader = new THREE.TextureLoader();
-   const displacement = loader.load("heightmap.png");
-   const loader_floor = new THREE.TextureLoader();
-   var floor_texture = loader_floor.load("ground.png");
-   floor_material = new THREE.MeshPhongMaterial({
-        color : 0xffff00,
-        map : floor_texture,
-        displacementMap : displacement,
-        displacementScale : 5,
-   });
+   globalThis.displacement = loader.load("heightmap.png");
+//    const loader_floor = new THREE.TextureLoader();
+//    var floor_texture = loader_floor.load("ground.png");
+//    floor_material = new THREE.MeshPhongMaterial({
+//         color : 0xffff00,
+//         map : floor_texture,
+//         displacementMap : displacement,
+//         displacementScale : 20,
+//         map : floor_texture,
+//    });
 
-   var floor_cube = new THREE.PlaneGeometry(100, 100, 40, 40);
-   floor = new THREE.Mesh(floor_cube, floor_material);
-   floor.rotation.x = -Math.PI/2;
-   floor.position.y = -25;
-   floor.position.x = 0;
-   floor.position.z = 0;
-   scene.add(floor) 
+//    var new_material = new THREE.MeshBasicMaterial({
+//     color: 0x33ff00,
+//     //wireframe : true,
+//     map : floor_texture,
+//     });
+   globalThis.floor_cube = new THREE.PlaneGeometry(1000, 1000, 40, 40);
+//    floor = new THREE.Mesh(floor_cube, floor_material);
+    generateTextureGround();
 }
 
 function buildSkyDome() {
-    var skyGeo = new THREE.SphereGeometry(100, 25, 25); 
-    var sky_loader  = new THREE.TextureLoader();
-    var sky_texture = sky_loader.load("ground.png"); // colocar aqui depois a textura que quero
-    var sky_material = new THREE.MeshPhongMaterial({ 
-        color : 0xffff00,
-        map: sky_texture,
-        wireframe: true
-    });
-    var sky = new THREE.Mesh(skyGeo, sky_material);
-    //sky.material.side = THREE.BackSide;
-    sky.position.y = -10
-    scene.add(sky);
+    globalThis.skyGeo = new THREE.SphereGeometry(500, 25, 25); 
+    // var loader  = new THREE.TextureLoader();
+    // var texture = loader.load( "ground.png" ); // colocar aqui depois a textura que quero
+    // var material = new THREE.MeshPhongMaterial({ 
+    //     map: texture,
+    //     color : 0xffff00
+    //     // wireframe: true
+    // });
+    // var sky = new THREE.Mesh(skyGeo, material);
+    generateTextureSky();
 }
 
-function createTree(x,y,z){
+function createTree(x,y,z, rx, ry, rz){
     tree=new THREE.Object3D();
     //create the main branch
     var tronco_principal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 5), mesh_phong_material_tronco);// raio de cima,raio debaixo,altura
@@ -187,6 +220,9 @@ function createTree(x,y,z){
     tree.add(copa_1);
     tree.add(copa_2);
     tree.position.set(x,y,z);
+    tree.rotation.set(rx,ry,rz);
+    tree.castShadow = true;
+    tree.receiveShadow = true;
     scene.add(tree);
 }
 
@@ -228,22 +264,22 @@ function createOvni() {
     //create ovni lights
     var ovni_light1=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light1.position.set(12,18,0);
-    pointlight1=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight1=new THREE.PointLight(0xFFFF00,1,30);
     ovni_light1.add(pointlight1);
 
     var ovni_light2=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light2.position.set(-12,18,0);
-    pointlight2=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight2=new THREE.PointLight(0xFFFF00,1,30);
     ovni_light2.add(pointlight2);
 
     var ovni_light3=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light3.position.set(0,18,12);
-    pointlight3=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight3=new THREE.PointLight(0xFFFF00,1,30);
     ovni_light3.add(pointlight3);
 
     var ovni_light4=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light4.position.set(0,18,-12);
-    pointlight4=new THREE.PointLight(0xFFFF00,1,60);
+    pointlight4=new THREE.PointLight(0xFFFF00,1,30);
     ovni_light4.add(pointlight4);
 
     //create the ovni
@@ -399,20 +435,16 @@ function createPortasJanelas() {
     const mesh = new THREE.Mesh( geom, material );
     scene.add(mesh);
 }
-//////////////////////
-/* CHECK COLLISIONS */
-//////////////////////
-function checkCollisions(){
+
+
+function createMoon() {
     'use strict';
-
-}
-
-///////////////////////
-/* HANDLE COLLISIONS */
-///////////////////////
-function handleCollisions(){
-    'use strict';
-
+    var geometry = new THREE.SphereGeometry(30, 32, 32);
+    globalThis.moon = new THREE.Mesh(geometry, mesh_toon_material_moon);
+    moon.position.set(moon_position.x, moon_position.y, moon_position.z);
+    moon.castShadow = false;
+    moon.receiveShadow = false;
+    scene.add(moon);
 }
 
 ////////////
@@ -455,7 +487,125 @@ function update_velocity() {
 
 /////////////
 /* DISPLAY */
-/////////////
+/////////////´
+// Create a canvas element
+const canvas = document.createElement('canvas');
+const context = canvas.getContext('2d');
+canvas.width = 2048;
+canvas.height = 2048;
+
+// Function to generate the texture
+function generateTextureSky() {
+  // Generate the gradient background
+  const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, 'darkviolet');
+  gradient.addColorStop(1, 'darkblue');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Add the stars
+  const numStars = 5000;
+  context.fillStyle = 'white';
+  for (let i = 0; i < numStars; i++) {
+    const radius = Math.random()*4;
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    context.beginPath();
+    context.arc(x, y, radius, 0, Math.PI*4, false);
+    context.closePath();
+    context.fill();
+  }
+
+  // Create a texture from the canvas
+  const texture = new THREE.CanvasTexture(canvas);
+
+  // Create a material using the texture
+  const material = new THREE.MeshBasicMaterial({ map: texture });
+  const newMesh = new THREE.Mesh(skyGeo, material);
+
+  // Remove previous plane (if any) from the scene
+  const previousPlane = scene.getObjectByName('skyDome');
+  if (previousPlane) {
+    scene.remove(previousPlane);
+  }
+
+  // Add the new plane to the scene
+  newMesh.name = 'skyDome';
+  
+  newMesh.material.side = THREE.BackSide;
+  newMesh.position.y = -10
+  newMesh.castShadow = false;
+  newMesh.receiveShadow = false;
+  scene.add(newMesh);
+}
+
+// Create a canvas element
+const canvas2 = document.createElement('canvas');
+var context2 = canvas2.getContext('2d');
+canvas2.width = 2048;
+canvas2.height = 2048;
+
+// Function to generate the texture
+function generateTextureGround() {
+  // Generate the green background
+  context2 = canvas2.getContext('2d');
+  context2.fillStyle = 'green';
+  context2.fillRect(0, 0, canvas2.width, canvas2.height);
+
+  // Add the stars
+  const numStars = 5000;
+  for (let i = 0; i < numStars; i++) {
+    switch (Math.round(Math.random()*4)) {
+        case 0:
+            context2.fillStyle = 'white';            
+            break;
+            
+        case 1:
+            context2.fillStyle = 'yellow';
+            break;
+
+        case 2:
+            context2.fillStyle = "Violet";
+            break;
+
+        case 3:
+            context2.fillStyle = "Cyan";
+            break;
+    }
+
+    const radius = 4;
+    const x = Math.random() * canvas2.width;
+    const y = Math.random() * canvas2.height;
+    context2.beginPath();
+    context2.arc(x, y, radius, 0, Math.PI*4, false);
+    context2.closePath();
+    context2.fill();
+  }
+
+  // Create a texture from the canvas2
+  const texture = new THREE.CanvasTexture(canvas2);
+
+  // Create a material using the texture
+  const material = new THREE.MeshStandardMaterial({ map: texture, displacementMap : displacement, displacementScale : 20 });
+  const newMesh = new THREE.Mesh(floor_cube, material);
+
+  // Remove previous plane (if any) from the scene
+  const previousPlane = scene.getObjectByName('ground');
+  if (previousPlane) {
+    scene.remove(previousPlane);
+  }
+
+  // Add the new plane to the scene
+  newMesh.name = 'ground';
+
+  newMesh.rotation.x = -Math.PI/2;
+  newMesh.position.y = -25;
+  newMesh.position.x = 0;
+  newMesh.position.z = 0;
+
+  scene.add(newMesh);
+}
+
 function render() {
     'use strict';
     renderer.render(scene, camera)
@@ -472,8 +622,11 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     renderer.setClearColor( 0xffffff, 0);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     createScene();
     createCamera();
+    createLights();
 
     render();
 
@@ -519,17 +672,36 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
     //luzes
-        case 80:
+        case 49: //1
+            console.log("gerar campo");
+            generateTextureGround();
+            break;
+
+        case 50: //2
+            console.log("gerar sky");
+            generateTextureSky();
+            break;
+
+        case 80: //P
+            console.log("bolas");
             pointlight1.visible = !pointlight1.visible;
             pointlight2.visible = !pointlight2.visible;
             pointlight3.visible = !pointlight3.visible;
             pointlight4.visible = !pointlight4.visible;
             break;
 
-        case 83:
+        case 83: //S
+            console.log("cilindro");
+            console.log(cylinderlight);
             //cylinderlight.intensity = 1 - cylinderlight.intensity;
             cylinderlight.visible = !cylinderlight.visible;
             break;
+
+        case 68: //D
+        case 100: //d
+            directional_light.visible = !directional_light.visible;
+            break;
+
         // arrow keys mudam variaveis booleanas que sao usadas no update
         case 37: // left arrow
             left = true;
@@ -550,6 +722,7 @@ function onKeyDown(e) {
             material_copa         = mesh_lambert_material_copa;
             material_cockpit      = mesh_lambert_material_cockpit;
             material_nave         = mesh_lambert_material_nave;
+            break;
         case 69: //E
             material_casa_paredes = mesh_phong_material_casa_paredes;
             material_casa_teto    = mesh_phong_material_casa_teto;
@@ -557,6 +730,7 @@ function onKeyDown(e) {
             material_copa         = mesh_phong_material_copa;
             material_cockpit      = mesh_phong_material_cockpit;
             material_nave         = mesh_phong_material_nave;
+            break;
         case 87: //W
             material_casa_paredes = mesh_toon_material_casa_paredes;
             material_casa_teto    = mesh_toon_material_casa_teto;
@@ -564,7 +738,9 @@ function onKeyDown(e) {
             material_copa         = mesh_toon_material_copa;
             material_cockpit      = mesh_toon_material_cockpit;
             material_nave         = mesh_toon_material_nave;
+            break;
         case 82: //R
+            break;
     }
     
 }
