@@ -27,7 +27,7 @@ var mesh_phong_material_copa           = new   THREE.MeshPhongMaterial({color:0x
 var mesh_toon_material_copa            = new    THREE.MeshToonMaterial({color:0x7CFC00});
 
 var moonLightColor = 0xf4ef8f;
-var moon_position = new THREE.Vector3(00, 100, -300);
+var moon_position = new THREE.Vector3(0, 100, -300);
 var mesh_toon_material_moon           = new THREE.MeshToonMaterial({ color: moonLightColor, emissive: 0x202020 });
 
 var cylinderlight, pointlight1, pointlight2, pointlight3, pointlight4, directional_light;
@@ -48,6 +48,9 @@ var forward = false, backward = false, left = false, right = false;
 var ovni_velocity=0.1;
 
 var casa, casa_paredes, casa_teto, tronco1, copa1, tronco2, copa2, tronco2, copa3, casa_janelasporta;
+
+var trees_copas = [];
+var trees_troncos = [];
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -89,12 +92,6 @@ function createScene(){
 /* CREATE CAMERA(S) */
 //////////////////////
 function createCamera() {
-    //width = window.innerWidth / 2;
-    //height = window.innerHeight / 2;
-    //camera = new THREE.OrthographicCamera(- width, width, height, -height, 1, 1000);
-    //camera.position.set(100, 0, 100);
-    //camera.lookAt(scene.position);
-
     camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.set(30, 15, 30);
     camera.lookAt(scene.position);
@@ -124,36 +121,12 @@ function createLights() {
 function buildFloor() {
    const loader = new THREE.TextureLoader();
    globalThis.displacement = loader.load("heightmap.png");
-//    const loader_floor = new THREE.TextureLoader();
-//    var floor_texture = loader_floor.load("ground.png");
-//    floor_material = new THREE.MeshPhongMaterial({
-//         color : 0xffff00,
-//         map : floor_texture,
-//         displacementMap : displacement,
-//         displacementScale : 20,
-//         map : floor_texture,
-//    });
-
-//    var new_material = new THREE.MeshBasicMaterial({
-//     color: 0x33ff00,
-//     //wireframe : true,
-//     map : floor_texture,
-//     });
    globalThis.floor_cube = new THREE.PlaneGeometry(1000, 1000, 40, 40);
-//    floor = new THREE.Mesh(floor_cube, floor_material);
     generateTextureGround();
 }
 
 function buildSkyDome() {
-    globalThis.skyGeo = new THREE.SphereGeometry(500, 25, 25); 
-    // var loader  = new THREE.TextureLoader();
-    // var texture = loader.load( "ground.png" ); // colocar aqui depois a textura que quero
-    // var material = new THREE.MeshPhongMaterial({ 
-    //     map: texture,
-    //     color : 0xffff00
-    //     // wireframe: true
-    // });
-    // var sky = new THREE.Mesh(skyGeo, material);
+    globalThis.skyGeo = new THREE.SphereGeometry(500, 25, 25);
     generateTextureSky();
 }
 
@@ -185,17 +158,12 @@ function createTree(x,y,z, rx, ry, rz){
     copa_principal.scale.y = 2; // Scale along the y-axis
     copa_principal.scale.z = 6; // Scale along the z-axis
 
-    
-    
-    
     //create the left treetoop
     var copa_1=new THREE.Mesh(tree_geometry,mesh_phong_material_copa);
     copa_1.position.set(-3,8,1);
-
     copa_1.scale.x=1.5;
     copa_1.scale.y=1.5;
     copa_1.scale.z=3;
-
 
     //create the right treetop
     var copa_2=new THREE.Mesh(tree_geometry,mesh_phong_material_copa);
@@ -212,6 +180,12 @@ function createTree(x,y,z, rx, ry, rz){
     tree.add(copa_principal);
     tree.add(copa_1);
     tree.add(copa_2);
+    trees_copas.push(copa_principal);
+    trees_copas.push(copa_1);
+    trees_copas.push(copa_2);
+    trees_troncos.push(tronco_principal);
+    trees_troncos.push(tronco_secundario);
+    trees_troncos.push(branch);
     tree.position.set(x,y,z);
     tree.rotation.set(rx,ry,rz);
     tree.castShadow = true;
@@ -439,6 +413,25 @@ function createMoon() {
     moon.castShadow = false;
     moon.receiveShadow = false;
     scene.add(moon);
+}
+
+function change_material_tree(new_material) {
+    if(new_material == 0) {
+        new_copa_material = mesh_lambert_material_copa;
+        new_tronco_material = mesh_lambert_material_tronco;
+    } else if (new_material == 1) {
+        new_copa_material = mesh_phong_material_copa;
+        new_tronco_material = mesh_phong_material_tronco;
+    } else {
+        new_copa_material = mesh_toon_material_copa;
+        new_tronco_material = mesh_toon_material_tronco;
+    }
+    trees_copas.forEach(tree => {
+        tree.material = new_copa_material;
+    });
+    trees_troncos.forEach(tree => {
+        tree.material = new_tronco_material;
+    })
 }
 
 ////////////
@@ -684,8 +677,6 @@ function onKeyDown(e) {
             break;
         case 83: //S
             console.log("cilindro");
-            console.log(cylinderlight);
-            //cylinderlight.intensity = 1 - cylinderlight.intensity;
             cylinderlight.visible = !cylinderlight.visible;
             break;
 
@@ -712,25 +703,21 @@ function onKeyDown(e) {
             casa_janelasporta.material = mesh_lambert_material_casa_paredes;
             casa_teto.material    = mesh_lambert_material_casa_teto;
             casa_janelasporta.material = mesh_lambert_material_casa_janelasporta;
-            //material_tronco       = mesh_lambert_material_tronco;
-            //material_copa         = mesh_lambert_material_copa;
-            console.ma
+            change_material_tree(0);
             break;
         case 69: //E
             console.log("PHONG");
             casa_paredes.material      = mesh_phong_material_casa_paredes;
             casa_teto.material         = mesh_phong_material_casa_teto;
             casa_janelasporta.material = mesh_phong_material_casa_janelasporta;
-            //material_tronco       = mesh_phong_material_tronco;
-            //material_copa         = mesh_phong_material_copa;
+            change_material_tree(1);
             break;
         case 87: //W
             console.log("TOON");
             casa_paredes.material = mesh_toon_material_casa_paredes;
             casa_teto.material    = mesh_toon_material_casa_teto;
             casa_janelasporta.material = mesh_toon_material_casa_janelasporta;
-            //material_tronco       = mesh_toon_material_tronco;
-            //material_copa         = mesh_toon_material_copa;
+            change_material_tree(2);
             break;
         case 82: //R
             break;
