@@ -112,6 +112,7 @@ function createLights() {
     directional_light = new THREE.DirectionalLight(moonLightColor, 1);
     directional_light.position.set(moon_position.x, moon_position.y, moon_position.z);
     directional_light.target = ovni;
+    directional_light.castShadow = true;
     scene.add(directional_light);
 }
 
@@ -209,6 +210,9 @@ function createOvni() {
     ovni_body.scale.y=20;
     ovni_body.scale.z=2;
     
+    ovni_body.castShadow = true;
+    ovni_body.receiveShadow = true; 
+    
     //create ovni cockpit
     var thetaStart = 0; // Ângulo inicial da calota (em radianos)
     var thetaLength = Math.PI; // Ângulo de abertura da calota (em radianos)
@@ -219,11 +223,15 @@ function createOvni() {
     var cockpit=new THREE.Mesh(cockpit_geometry,material_ovni_cockpit);
     cockpit.position.set(0,21,0);
     cockpit.rotation.x=-Math.PI/2;
+    cockpit.castShadow = true;
+    cockpit.receiveShadow = true; 
     
     
     //create ovni cylinder
     var ovni_cylinder=new THREE.Mesh(new THREE.CylinderGeometry(7,7,2),material_ovni_cylinder);
     ovni_cylinder.position.set(0,18,0);
+    ovni_cylinder.castShadow = false;
+    ovni_cylinder.receiveShadow = false;
     cylinderlight=new THREE.SpotLight(0xFFFF00, 1, 0, 50);
     cylinderlight.target = light_target;
     ovni_cylinder.add(cylinderlight);
@@ -232,22 +240,34 @@ function createOvni() {
     //create ovni lights
     var ovni_light1=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light1.position.set(12,18,0);
+    ovni_light1.castShadow = false;
+    ovni_light1.receiveShadow = false;
     pointlight1=new THREE.PointLight(0xFFFF00,1,30);
+    pointlight1.castShadow = true;
     ovni_light1.add(pointlight1);
 
     var ovni_light2=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light2.position.set(-12,18,0);
+    ovni_light2.castShadow = false;
+    ovni_light2.receiveShadow = false;
     pointlight2=new THREE.PointLight(0xFFFF00,1,30);
+    pointlight2.castShadow = true;
     ovni_light2.add(pointlight2);
 
     var ovni_light3=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light3.position.set(0,18,12);
+    ovni_light3.castShadow = false;
+    ovni_light3.receiveShadow = false;
     pointlight3=new THREE.PointLight(0xFFFF00,1,30);
+    pointlight3.castShadow = true;
     ovni_light3.add(pointlight3);
 
     var ovni_light4=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),material_ovni_light);
     ovni_light4.position.set(0,18,-12);
+    ovni_light4.castShadow = false;
+    ovni_light4.receiveShadow = false;
     pointlight4=new THREE.PointLight(0xFFFF00,1,30);
+    pointlight4.castShadow = true;
     ovni_light4.add(pointlight4);
 
     //create the ovni
@@ -360,7 +380,9 @@ function createLados(pos_x) {
     geom.computeVertexNormals();
     const material = mesh_phong_material_casa_paredes;
     casa_paredes = new THREE.Mesh( geom, material );
-    //mesh.position.x = pos_x;
+    casa_paredes.castShadow = true;
+    casa_paredes.receiveShadow = true;
+    //casa_paredes.position.x = pos_x;
 
     scene.add(casa_paredes);
 }
@@ -402,6 +424,8 @@ function createPortasJanelas() {
     geom.computeVertexNormals();
     const material = mesh_phong_material_casa_janelasporta;
     casa_janelasporta = new THREE.Mesh( geom, material );
+    casa_janelasporta.castShadow = false;
+    casa_janelasporta.receiveShadow = true;
     scene.add(casa_janelasporta);
 }
 
@@ -670,6 +694,7 @@ function onKeyDown(e) {
             break;
 
         case 80: //P
+        case 112: //p
             console.log("bolas");
             pointlight1.visible = !pointlight1.visible;
             pointlight2.visible = !pointlight2.visible;
@@ -677,6 +702,7 @@ function onKeyDown(e) {
             pointlight4.visible = !pointlight4.visible;
             break;
         case 83: //S
+        case 115: //s
             console.log("cilindro");
             cylinderlight.visible = !cylinderlight.visible;
             break;
@@ -700,13 +726,15 @@ function onKeyDown(e) {
             backward = true;
             break;
         case 81: //Q
-	    console.log("LAMBERT");
+        case 113: //q
+	        console.log("LAMBERT");
             casa_janelasporta.material = mesh_lambert_material_casa_paredes;
             casa_teto.material    = mesh_lambert_material_casa_teto;
             casa_janelasporta.material = mesh_lambert_material_casa_janelasporta;
             change_material_tree(0);
             break;
         case 69: //E
+        case 101: //e
             console.log("PHONG");
             casa_paredes.material      = mesh_phong_material_casa_paredes;
             casa_teto.material         = mesh_phong_material_casa_teto;
@@ -714,6 +742,7 @@ function onKeyDown(e) {
             change_material_tree(1);
             break;
         case 87: //W
+        case 119: //w
             console.log("TOON");
             casa_paredes.material = mesh_toon_material_casa_paredes;
             casa_teto.material    = mesh_toon_material_casa_teto;
@@ -721,6 +750,7 @@ function onKeyDown(e) {
             change_material_tree(2);
             break;
         case 82: //R
+        case 114: //r
             cylinderlight.visible = !cylinderlight.visible;
             pointlight1.visible = !pointlight1.visible;
             pointlight2.visible = !pointlight2.visible;
@@ -730,7 +760,6 @@ function onKeyDown(e) {
             directional_light.visible = !directional_light.visible;
             break;
     }
-    
 }
 
 ///////////////////////
