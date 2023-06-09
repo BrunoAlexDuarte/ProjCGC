@@ -466,7 +466,17 @@ function animate() {
 ////////////////////////////
 function onResize() { 
     'use strict';
+    console.log("resize");
 
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        // if camera is instance of Ortographic camera
+        if (camera instanceof THREE.PerspectiveCamera) {
+            camera.aspect = window.innerWidth / window.innerHeight;
+        }
+        camera.updateProjectionMatrix();
+    }
 }
 
 ///////////////////////
